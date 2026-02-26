@@ -1,0 +1,100 @@
+# openrtb-dsp-faker デフォルト設定ファイル
+# SSP/Ad Exchange開発者がDSP接続テストに使うためのモックDSP設定
+
+# サーバー基本設定
+server:
+  port: 8081
+  read_timeout_ms: 5000
+  write_timeout_ms: 5000
+
+# DSP挙動シミュレーション設定
+behavior:
+  # 入札確率 (0.0 ~ 1.0)
+  # 1.0 = 常に入札, 0.0 = 常にno-bid
+  bid_rate: 0.7
+
+  # レイテンシシミュレーション
+  # 実際のDSPは通常50-100ms程度で応答する
+  latency:
+    min_ms: 10
+    max_ms: 80
+
+  # エラーシミュレーション
+  error:
+    # HTTP error返却率 (0.0 ~ 1.0)
+    rate: 0.02
+    # 返すHTTPステータスコード (ランダム選択)
+    codes: [500, 503]
+
+  # タイムアウトシミュレーション
+  # bid requestのtmax超過を意図的に発生させる
+  timeout_rate: 0.01
+
+# 入札設定
+bidding:
+  # 入札価格レンジ (USD CPM)
+  price:
+    min: 0.50
+    max: 15.00
+  # 通貨
+  currency: "USD"
+  # seat名
+  seat: "faker-dsp-seat-1"
+  # 広告主ドメイン
+  advertiser_domains:
+    - "example-advertiser.com"
+    - "brand-demo.com"
+  # ダミーad markup テンプレート
+  adm_template: '<div class="faker-ad">Faker DSP Ad - ${CREATIVE_ID}</div>'
+
+# --------------------------------------------------------------------------
+# カスタム拡張パラメーター
+# SSPでのDSP接続テストで「これが再現できると嬉しい」機能群
+# --------------------------------------------------------------------------
+custom:
+  # imp typeごとの入札率差分
+  # 未指定の場合はbehavior.bid_rateが全体に適用される
+  # videoはbannerより入札率が低い傾向をシミュレーション
+  bid_rate_by_imp_type:
+    banner: 0.8
+    video: 0.5
+
+  # 特定domain/bundleに対する挙動オーバーライド
+  # SSPテストで「特定パブリッシャーだけno-bidにしたい」等に便利
+  domain_overrides:
+    - domain: "blocked-publisher.com"
+      no_bid: true
+    - domain: "premium-publisher.com"
+      bid_rate: 0.95
+      price_min: 5.00
+      price_max: 25.00
+    - bundle: "com.example.gameapp"
+      bid_rate: 0.6
+      price_min: 1.00
+      price_max: 8.00
+
+  # creativeサイズバリエーション
+  # impにサイズ指定がない場合にここからランダム選択
+  creative_sizes:
+    - { w: 300, h: 250 }
+    - { w: 728, h: 90 }
+    - { w: 320, h: 50 }
+    - { w: 160, h: 600 }
+
+  # PMP deal対応
+  # deal IDを指定してDSPがprivate dealに応答するシミュレーション
+  deal_support:
+    enabled: false
+    deals:
+      - deal_id: "deal-001"
+        bidfloor: 5.00
+        seat: "pmp-seat-1"
+
+  # No-Bid Reason (nbr)
+  # OpenRTB 2.6 no-bid reasonコードの返却シミュレーション
+  # 0=Unknown, 1=Technical Error, 2=Invalid Request,
+  # 3=Known Web Spider, 4=Suspected Non-Human, 5=Cloud/Data Center,
+  # 6=Unsupported Device, 7=Blocked Publisher, 8=Unmatched User
+  no_bid_reason:
+    enabled: false
+    codes: [0, 7, 8]
