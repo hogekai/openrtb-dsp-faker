@@ -59,13 +59,13 @@ type PriceConfig struct {
 
 // CustomConfig holds SSP-developer-friendly extended parameters.
 type CustomConfig struct {
-	// imp typeごとの入札率差分 (banner vs video)
+	// Bid rate differentiation per imp type (banner vs video)
 	BidRateByImpType BidRateByImpType `yaml:"bid_rate_by_imp_type"`
-	// 特定domain/bundleでの挙動オーバーライド
+	// Behavior override for specific domains/bundles
 	DomainOverrides []DomainOverride `yaml:"domain_overrides"`
-	// creative サイズのバリエーション
+	// Creative size variations
 	CreativeSizes []CreativeSize `yaml:"creative_sizes"`
-	// PMP deal対応
+	// PMP deal support
 	DealSupport DealSupportConfig `yaml:"deal_support"`
 	// No-Bid Reason (nbr)
 	NoBidReason NoBidReasonConfig `yaml:"no_bid_reason"`

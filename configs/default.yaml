@@ -1,66 +1,66 @@
-# openrtb-dsp-faker デフォルト設定ファイル
-# SSP/Ad Exchange開発者がDSP接続テストに使うためのモックDSP設定
+# openrtb-dsp-faker default configuration
+# Mock DSP settings for SSP/Ad Exchange developers to test DSP integrations
 
-# サーバー基本設定
+# Server settings
 server:
   port: 8081
   read_timeout_ms: 5000
   write_timeout_ms: 5000
 
-# DSP挙動シミュレーション設定
+# DSP behavior simulation
 behavior:
-  # 入札確率 (0.0 ~ 1.0)
-  # 1.0 = 常に入札, 0.0 = 常にno-bid
+  # Bid probability (0.0 ~ 1.0)
+  # 1.0 = always bid, 0.0 = always no-bid
   bid_rate: 0.7
 
-  # レイテンシシミュレーション
-  # 実際のDSPは通常50-100ms程度で応答する
+  # Latency simulation
+  # Real DSPs typically respond in 50-100ms
   latency:
     min_ms: 10
     max_ms: 80
 
-  # エラーシミュレーション
+  # Error simulation
   error:
-    # HTTP error返却率 (0.0 ~ 1.0)
+    # HTTP error rate (0.0 ~ 1.0)
     rate: 0.02
-    # 返すHTTPステータスコード (ランダム選択)
+    # HTTP status codes to return (randomly selected)
     codes: [500, 503]
 
-  # タイムアウトシミュレーション
-  # bid requestのtmax超過を意図的に発生させる
+  # Timeout simulation
+  # Intentionally exceed the bid request tmax
   timeout_rate: 0.01
 
-# 入札設定
+# Bidding settings
 bidding:
-  # 入札価格レンジ (USD CPM)
+  # Bid price range (USD CPM)
   price:
     min: 0.50
     max: 15.00
-  # 通貨
+  # Currency
   currency: "USD"
-  # seat名
+  # Seat name
   seat: "faker-dsp-seat-1"
-  # 広告主ドメイン
+  # Advertiser domains
   advertiser_domains:
     - "example-advertiser.com"
     - "brand-demo.com"
-  # ダミーad markup テンプレート
+  # Dummy ad markup template
   adm_template: '<div class="faker-ad">Faker DSP Ad - ${CREATIVE_ID}</div>'
 
 # --------------------------------------------------------------------------
-# カスタム拡張パラメーター
-# SSPでのDSP接続テストで「これが再現できると嬉しい」機能群
+# Custom extended parameters
+# Features useful for SSP DSP integration testing
 # --------------------------------------------------------------------------
 custom:
-  # imp typeごとの入札率差分
-  # 未指定の場合はbehavior.bid_rateが全体に適用される
-  # videoはbannerより入札率が低い傾向をシミュレーション
+  # Bid rate differentiation per imp type
+  # Falls back to behavior.bid_rate when not specified
+  # Simulates the tendency for video to have lower bid rates than banner
   bid_rate_by_imp_type:
     banner: 0.8
     video: 0.5
 
-  # 特定domain/bundleに対する挙動オーバーライド
-  # SSPテストで「特定パブリッシャーだけno-bidにしたい」等に便利
+  # Behavior overrides for specific domains/bundles
+  # Useful for SSP testing scenarios like "no-bid only for a specific publisher"
   domain_overrides:
     - domain: "blocked-publisher.com"
       no_bid: true
@@ -73,16 +73,16 @@ custom:
       price_min: 1.00
       price_max: 8.00
 
-  # creativeサイズバリエーション
-  # impにサイズ指定がない場合にここからランダム選択
+  # Creative size variations
+  # Randomly selected when the imp has no size specified
   creative_sizes:
     - { w: 300, h: 250 }
     - { w: 728, h: 90 }
     - { w: 320, h: 50 }
     - { w: 160, h: 600 }
 
-  # PMP deal対応
-  # deal IDを指定してDSPがprivate dealに応答するシミュレーション
+  # PMP deal support
+  # Simulates DSP responding to private deals with specified deal IDs
   deal_support:
     enabled: false
     deals:
@@ -91,7 +91,7 @@ custom:
         seat: "pmp-seat-1"
 
   # No-Bid Reason (nbr)
-  # OpenRTB 2.6 no-bid reasonコードの返却シミュレーション
+  # Simulates returning OpenRTB 2.6 no-bid reason codes
   # 0=Unknown, 1=Technical Error, 2=Invalid Request,
   # 3=Known Web Spider, 4=Suspected Non-Human, 5=Cloud/Data Center,
   # 6=Unsupported Device, 7=Blocked Publisher, 8=Unmatched User
